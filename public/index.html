@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>🤖 Robot Logika</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #fef9f0;
+  --card: #ffffff;
+  --border: #e8d5b0;
+  --accent: #ff6b35;
+  --accent2: #4ecdc4;
+  --blue: #3b82f6;
+  --green: #22c55e;
+  --red: #ef4444;
+  --yellow: #f59e0b;
+  --purple: #8b5cf6;
+  --text: #1e293b;
+  --muted: #94a3b8;
+  --shadow: 0 4px 0 #d4a574;
+  --shadow-hover: 0 2px 0 #d4a574;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+
+body {
+  font-family:'Nunito',sans-serif;
+  background: var(--bg);
+  background-image: radial-gradient(circle at 20% 20%, #ffe4d4 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, #d4f1ee 0%, transparent 50%);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Dot pattern bg */
+body::before {
+  content:'';position:fixed;inset:0;
+  background-image: radial-gradient(#e8d5b0 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  opacity:.4;pointer-events:none;z-index:0;
+}
+
+.screen{display:none;position:relative;z-index:1}
+.screen.active{display:flex;flex-direction:column;align-items:center;min-height:100vh;padding:20px 16px}
+
+/* ── ROBOT CHARACTER ── */
+.robot-wrap{position:relative;display:inline-block;margin-bottom:8px}
+.robot-body{
+  width:90px;height:90px;background:linear-gradient(135deg,#4ecdc4,#2dd4bf);
+  border-radius:20px;border:3px solid #0d9488;
+  box-shadow:0 6px 0 #0d9488;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.8rem;position:relative;
+  animation:robotBob 2s ease-in-out infinite;
+}
+.robot-ear{
+  position:absolute;width:14px;height:22px;background:#0d9488;border-radius:4px;top:22px;
+}
+.robot-ear.left{left:-14px}
+.robot-ear.right{right:-14px}
+.robot-antenna{
+  position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+  width:4px;height:16px;background:#0d9488;border-radius:2px;
+}
+.robot-antenna::after{
+  content:'';position:absolute;top:-7px;left:50%;transform:translateX(-50%);
+  width:10px;height:10px;background:var(--accent);border-radius:50%;
+  box-shadow:0 0 8px var(--accent);animation:antBlink 1.5s ease-in-out infinite;
+}
+
+@keyframes robotBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes antBlink{0%,100%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:.5;transform:translateX(-50%) scale(.8)}}
+
+/* ── TYPOGRAPHY ── */
+h1{font-family:'Fredoka One',cursive;font-size:clamp(2rem,6vw,3rem);
+  background:linear-gradient(135deg,var(--accent),#e91e8c);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  line-height:1.1;letter-spacing:1px}
+.sub{color:var(--muted);font-size:.95rem;margin-top:6px;font-weight:600}
+
+/* ── CARD ── */
+.card{
+  background:var(--card);border:3px solid var(--border);
+  border-radius:24px;padding:24px;width:100%;max-width:540px;
+  box-shadow:0 6px 0 var(--border),0 12px 30px rgba(0,0,0,.08);
+}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 24px;border-radius:14px;border:3px solid transparent;
+  cursor:pointer;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;
+  transition:all .15s;width:100%;margin-top:10px;
+  box-shadow:var(--shadow);position:relative;top:0;
+}
+.btn:hover{box-shadow:var(--shadow-hover);top:2px}
+.btn:active{box-shadow:none;top:4px}
+.btn-primary{background:var(--accent);color:#fff;border-color:#cc4a1f}
+.btn-green{background:var(--green);color:#fff;border-color:#15803d}
+.btn-blue{background:var(--blue);color:#fff;border-color:#1d4ed8}
+.btn-purple{background:var(--purple);color:#fff;border-color:#5b21b6}
+.btn-outline{background:#fff;color:var(--text);border-color:var(--border)}
+.btn-sm{padding:8px 16px;font-size:.85rem;width:auto;margin-top:0;box-shadow:0 3px 0 #d4a574}
+
+/* ── INPUT ── */
+input[type=text]{
+  width:100%;padding:14px 18px;background:#fafafa;
+  border:3px solid var(--border);border-radius:14px;
+  color:var(--text);font-size:1.1rem;font-family:'Nunito',sans-serif;font-weight:700;
+  outline:none;transition:border-color .2s;margin:10px 0;
+}
+input[type=text]:focus{border-color:var(--accent);background:#fff}
+input[type=text]::placeholder{color:var(--muted);font-weight:600}
+
+/* ── PLAYER BADGE ── */
+.player-badge{
+  display:flex;align-items:center;gap:12px;
+  background:#fff;border:3px solid var(--border);
+  border-radius:18px;padding:12px 16px;margin-bottom:16px;
+  width:100%;max-width:540px;
+  box-shadow:0 4px 0 var(--border);
+}
+.avatar{
+  width:50px;height:50px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--accent),#e91e8c);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;font-weight:900;color:#fff;
+  border:3px solid rgba(0,0,0,.1);
+}
+.badge-name{font-weight:900;font-size:1.05rem}
+.badge-stats{color:var(--muted);font-size:.82rem;margin-top:2px;font-weight:700}
+
+/* ── MENU GRID ── */
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.menu-item{
+  background:#fff;border:3px solid var(--border);border-radius:18px;
+  padding:18px 12px;cursor:pointer;transition:all .15s;text-align:center;
+  box-shadow:0 5px 0 var(--border);position:relative;top:0;
+}
+.menu-item:hover{top:2px;box-shadow:0 3px 0 var(--border)}
+.menu-item:active{top:5px;box-shadow:none}
+.menu-item .icon{font-size:2.2rem;margin-bottom:8px}
+.menu-item .label{font-weight:900;font-size:.9rem}
+
+/* ── LEVEL CARDS ── */
+.level-card{
+  background:#fff;border:3px solid var(--border);border-radius:18px;
+  padding:16px 18px;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:14px;margin-bottom:12px;
+  box-shadow:0 5px 0 var(--border);position:relative;top:0;
+}
+.level-card:hover:not(.locked){top:2px;box-shadow:0 3px 0 var(--border)}
+.level-card:active:not(.locked){top:5px;box-shadow:none}
+.level-card.locked{opacity:.5;cursor:not-allowed}
+.level-card.done{border-color:#86efac;box-shadow:0 5px 0 #86efac}
+.level-emoji{
+  width:54px;height:54px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:1.8rem;
+  background:linear-gradient(135deg,#ffe4d4,#ffd4b8);border:2px solid var(--border);
+}
+.level-card.done .level-emoji{background:linear-gradient(135deg,#dcfce7,#bbf7d0);border-color:#86efac}
+.level-name{font-weight:900;font-size:1rem}
+.level-desc{color:var(--muted);font-size:.8rem;margin-top:2px;font-weight:700}
+.level-meta{font-size:.78rem;color:var(--accent);margin-top:4px;font-weight:800}
+.level-status{margin-left:auto;font-size:1.5rem;flex-shrink:0}
+
+/* ── GAME SCREEN ── */
+.game-top{
+  width:100%;max-width:600px;display:flex;align-items:center;
+  justify-content:space-between;gap:10px;margin-bottom:14px;
+}
+.game-stat-pill{
+  background:#fff;border:2px solid var(--border);border-radius:12px;
+  padding:8px 14px;text-align:center;box-shadow:0 3px 0 var(--border);
+}
+.gsp-val{font-family:'Fredoka One',cursive;font-size:1.3rem;color:var(--accent);line-height:1}
+.gsp-lbl{font-size:.68rem;color:var(--muted);font-weight:800;margin-top:1px}
+
+.progress-wrap{width:100%;max-width:600px;margin-bottom:16px}
+.progress-track{height:12px;background:#e8d5b0;border-radius:99px;overflow:hidden;border:2px solid var(--border)}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width .5s ease}
+.progress-label{font-size:.78rem;color:var(--muted);font-weight:800;text-align:right;margin-top:4px}
+
+/* Robot di game */
+.game-robot{
+  display:flex;align-items:center;gap:14px;margin-bottom:16px;
+  width:100%;max-width:600px;
+}
+.mini-robot{
+  width:64px;height:64px;background:linear-gradient(135deg,#4ecdc4,#2dd4bf);
+  border-radius:16px;border:3px solid #0d9488;
+  display:flex;align-items:center;justify-content:center;font-size:2rem;flex-shrink:0;
+  box-shadow:0 4px 0 #0d9488;animation:robotBob 2s ease-in-out infinite;
+}
+.speech-bubble{
+  background:#fff;border:3px solid var(--border);border-radius:16px;padding:12px 16px;
+  position:relative;flex:1;box-shadow:0 4px 0 var(--border);
+  font-weight:700;font-size:.9rem;line-height:1.5;
+}
+.speech-bubble::before{
+  content:'';position:absolute;left:-14px;top:18px;
+  border:8px solid transparent;border-right-color:var(--border);
+}
+.speech-bubble::after{
+  content:'';position:absolute;left:-9px;top:19px;
+  border:7px solid transparent;border-right-color:#fff;
+}
+
+/* Pertanyaan & Pilihan */
+.question-box{
+  width:100%;max-width:600px;background:#fff;
+  border:3px solid var(--border);border-radius:20px;padding:20px;
+  box-shadow:0 6px 0 var(--border);margin-bottom:14px;
+}
+.q-number{
+  display:inline-block;background:var(--accent);color:#fff;
+  font-family:'Fredoka One',cursive;font-size:1rem;padding:4px 12px;
+  border-radius:99px;margin-bottom:10px;
+}
+.q-text{font-weight:800;font-size:1rem;line-height:1.6;color:var(--text)}
+
+.choices{display:flex;flex-direction:column;gap:10px;margin-top:14px;width:100%;max-width:600px}
+.choice-btn{
+  background:#fff;border:3px solid var(--border);border-radius:16px;
+  padding:14px 16px;cursor:pointer;text-align:left;
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;color:var(--text);
+  transition:all .15s;display:flex;align-items:center;gap:12px;
+  box-shadow:0 4px 0 var(--border);position:relative;top:0;
+}
+.choice-btn:hover:not(:disabled){border-color:var(--accent);top:2px;box-shadow:0 2px 0 #d4a574}
+.choice-btn:active:not(:disabled){top:4px;box-shadow:none}
+.choice-btn:disabled{cursor:not-allowed}
+.choice-btn.correct{border-color:var(--green);background:#f0fdf4;box-shadow:0 4px 0 #86efac}
+.choice-btn.wrong{border-color:var(--red);background:#fff5f5;box-shadow:0 4px 0 #fca5a5;opacity:.75}
+.choice-letter{
+  width:32px;height:32px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,#f1f5f9,#e2e8f0);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:.9rem;border:2px solid var(--border);
+}
+.choice-btn.correct .choice-letter{background:var(--green);color:#fff;border-color:#15803d}
+.choice-btn.wrong .choice-letter{background:var(--red);color:#fff;border-color:#b91c1c}
+
+/* Feedback */
+.feedback{
+  width:100%;max-width:600px;border-radius:18px;padding:16px 18px;
+  display:none;animation:popIn .3s ease;margin-top:4px;
+}
+.feedback.show{display:block}
+.feedback.benar{background:#f0fdf4;border:3px solid var(--green)}
+.feedback.salah{background:#fff5f5;border:3px solid var(--red)}
+.feedback-head{font-weight:900;font-size:1.05rem;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.feedback.benar .feedback-head{color:#15803d}
+.feedback.salah .feedback-head{color:#dc2626}
+.feedback-body{font-size:.9rem;line-height:1.6;font-weight:700;color:var(--text)}
+
+/* ── HASIL ── */
+.result-hero{text-align:center;margin-bottom:20px}
+.result-icon{font-size:5rem;animation:popIn .5s ease}
+.result-title{font-family:'Fredoka One',cursive;font-size:2rem;margin-top:8px}
+.result-lulus .result-title{color:var(--green)}
+.result-gagal .result-title{color:var(--red)}
+.result-sub{color:var(--muted);font-weight:700;font-size:.9rem;margin-top:4px}
+
+.result-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.rs-box{background:#fff;border:3px solid var(--border);border-radius:16px;padding:14px;text-align:center;box-shadow:0 4px 0 var(--border)}
+.rs-val{font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--accent)}
+.rs-lbl{font-size:.73rem;color:var(--muted);font-weight:800;margin-top:2px}
+
+.detail-list{margin-bottom:16px;max-height:220px;overflow-y:auto;padding-right:4px}
+.detail-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px;border-radius:12px;margin-bottom:6px;font-size:.85rem;
+}
+.detail-item.b{background:#f0fdf4}
+.detail-item.s{background:#fff5f5}
+
+.hadiah-box{
+  background:linear-gradient(135deg,#fffbeb,#fef3c7);border:3px solid var(--yellow);
+  border-radius:16px;padding:14px;text-align:center;margin-bottom:12px;
+  box-shadow:0 4px 0 #d97706;
+}
+.hadiah-box .h-icon{font-size:2rem}
+.hadiah-box .h-name{font-weight:900;color:#92400e;margin-top:4px}
+
+/* ── RANKING ── */
+.rank-item{
+  display:flex;align-items:center;gap:12px;
+  background:#fff;border:3px solid var(--border);border-radius:16px;
+  padding:12px 16px;margin-bottom:10px;box-shadow:0 4px 0 var(--border);
+}
+.rank-num{font-family:'Fredoka One',cursive;font-size:1.5rem;width:36px;text-align:center}
+.rank-name{font-weight:900}
+.rank-meta{font-size:.78rem;color:var(--muted);font-weight:700}
+.rank-score{margin-left:auto;font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--accent)}
+
+/* ── STATS ── */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-box{background:#fff;border:3px solid var(--border);border-radius:14px;padding:14px;text-align:center;box-shadow:0 4px 0 var(--border)}
+.stat-val{font-family:'Fredoka One',cursive;font-size:1.4rem;color:var(--accent)}
+.stat-lbl{font-size:.75rem;color:var(--muted);font-weight:800;margin-top:2px}
+
+.hadiah-tags{display:flex;flex-wrap:wrap;gap:8px}
+.h-tag{background:#fffbeb;border:2px solid var(--yellow);border-radius:99px;padding:5px 12px;font-size:.82rem;font-weight:800;color:#92400e}
+
+.riwayat-item{
+  background:#fff;border:2px solid var(--border);border-radius:12px;
+  padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;
+}
+
+/* ── SECTION TITLE ── */
+.section-title{
+  font-family:'Fredoka One',cursive;font-size:1.3rem;
+  color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.back-btn{
+  display:flex;align-items:center;gap:6px;color:var(--muted);font-weight:900;
+  cursor:pointer;margin-bottom:14px;transition:color .2s;font-size:.9rem;
+  background:none;border:none;padding:0;
+}
+.back-btn:hover{color:var(--accent)}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:24px;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:#1e293b;color:#fff;border-radius:14px;padding:12px 24px;
+  font-weight:800;font-size:.9rem;transition:transform .3s;z-index:999;
+  white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.3);
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+/* ── ANIMATIONS ── */
+@keyframes popIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:fadeUp .4s ease}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── PANDUAN ── */
+.panduan-box{background:#fff;border:3px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;box-shadow:0 4px 0 var(--border)}
+.panduan-box h3{font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--accent);margin-bottom:8px}
+.panduan-box p,.panduan-box li{font-weight:700;font-size:.9rem;line-height:1.7;color:var(--text)}
+.panduan-box ul{padding-left:18px}
+.level-table{width:100%;border-collapse:collapse;font-size:.82rem;font-weight:700}
+.level-table th{text-align:left;padding:6px 8px;color:var(--muted);border-bottom:2px solid var(--border)}
+.level-table td{padding:6px 8px;border-bottom:1px solid #f1f5f9}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══ -->
+<div id="screen-login" class="screen active">
+  <div style="text-align:center;margin-bottom:24px" class="anim">
+    <div class="robot-wrap">
+      <div class="robot-body">
+        <div class="robot-ear left"></div>
+        <div class="robot-ear right"></div>
+        <div class="robot-antenna"></div>
+        🤖
+      </div>
+    </div>
+    <h1>Robot Logika</h1>
+    <p class="sub">Bantu Robot membuat keputusan yang tepat!</p>
+  </div>
+  <div class="card anim" style="max-width:420px">
+    <p style="font-weight:900;margin-bottom:4px;font-size:1.05rem">👤 Siapa namamu?</p>
+    <p style="color:var(--muted);font-size:.85rem;font-weight:700;margin-bottom:6px">Masukkan namamu untuk mulai bermain</p>
+    <input type="text" id="input-nama" placeholder="Contoh: Budi, Siti, Andi..." maxlength="25" autocomplete="off"/>
+    <button class="btn btn-primary" onclick="handleLogin()">🚀 Ayo Bermain!</button>
+  </div>
+</div>
+
+<!-- ══ MENU ══ -->
+<div id="screen-menu" class="screen">
+  <div style="text-align:center;margin-bottom:20px" class="anim">
+    <div class="robot-wrap">
+      <div class="robot-body">
+        <div class="robot-ear left"></div><div class="robot-ear right"></div>
+        <div class="robot-antenna"></div>🤖
+      </div>
+    </div>
+    <h1>Robot Logika</h1>
+  </div>
+  <div id="player-badge" class="player-badge anim"></div>
+  <div class="card anim">
+    <div class="menu-grid">
+      <div class="menu-item" onclick="tampilLevel()"><div class="icon">🎮</div><div class="label">Mulai Main</div></div>
+      <div class="menu-item" onclick="tampilStats()"><div class="icon">📊</div><div class="label">Statistikku</div></div>
+      <div class="menu-item" onclick="tampilRanking()"><div class="icon">🏆</div><div class="label">Peringkat</div></div>
+      <div class="menu-item" onclick="tampilPanduan()"><div class="icon">📖</div><div class="label">Panduan</div></div>
+    </div>
+    <button class="btn btn-outline" style="margin-top:16px" onclick="gantiPemain()">🔄 Ganti Pemain</button>
+  </div>
+</div>
+
+<!-- ══ LEVEL ══ -->
+<div id="screen-level" class="screen">
+  <div style="text-align:center;margin-bottom:16px"><h1>🎯 Pilih Level</h1></div>
+  <div style="width:100%;max-width:540px">
+    <button class="back-btn" onclick="tampilMenu()">← Kembali ke Menu</button>
+    <div id="level-list"></div>
+  </div>
+</div>
+
+<!-- ══ GAME ══ -->
+<div id="screen-game" class="screen">
+  <div class="game-top anim">
+    <div class="game-stat-pill"><div class="gsp-val" id="g-level">1</div><div class="gsp-lbl">Level</div></div>
+    <div class="game-stat-pill"><div class="gsp-val" id="g-soal">1/5</div><div class="gsp-lbl">Soal</div></div>
+    <div class="game-stat-pill"><div class="gsp-val" id="g-skor" style="color:var(--yellow)">0</div><div class="gsp-lbl">⭐ Skor</div></div>
+    <div class="game-stat-pill"><div class="gsp-val" id="g-benar" style="color:var(--green)">0</div><div class="gsp-lbl">✅ Benar</div></div>
+  </div>
+
+  <div class="progress-wrap anim">
+    <div class="progress-track"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    <div class="progress-label" id="prog-label">0 / 0 soal</div>
+  </div>
+
+  <div class="game-robot anim">
+    <div class="mini-robot" id="robot-ekspresi">🤖</div>
+    <div class="speech-bubble" id="robot-kata">Ayo bantu aku berpikir! 🤔</div>
+  </div>
+
+  <div class="question-box anim">
+    <div class="q-number" id="q-num">Soal 1</div>
+    <div style="background:#fffbeb;border:2px solid #fde68a;border-radius:12px;padding:12px;margin-bottom:12px;font-size:.88rem;font-weight:700;line-height:1.6;color:#78350f" id="q-situasi"></div>
+    <div class="q-text" id="q-text"></div>
+  </div>
+
+  <div class="choices anim" id="choices"></div>
+
+  <div class="feedback" id="feedback">
+    <div class="feedback-head" id="fb-head"></div>
+    <div class="feedback-body" id="fb-body"></div>
+    <button class="btn btn-primary" id="btn-lanjut" onclick="lanjutSoal()" style="margin-top:12px">Soal Berikutnya →</button>
+  </div>
+</div>
+
+<!-- ══ HASIL ══ -->
+<div id="screen-hasil" class="screen">
+  <div style="width:100%;max-width:540px">
+    <div id="result-hero" class="result-hero anim"></div>
+    <div id="result-stats" class="result-stats"></div>
+    <div id="hadiah-box-wrap"></div>
+    <div style="font-weight:900;margin-bottom:8px;font-size:.95rem">📋 Detail Jawaban:</div>
+    <div id="detail-list" class="detail-list"></div>
+    <button class="btn btn-primary" id="btn-ulangi">🔁 Ulangi Level Ini</button>
+    <button class="btn btn-blue" onclick="tampilLevel()">📋 Level Lain</button>
+    <button class="btn btn-outline" onclick="tampilMenu()">🏠 Menu Utama</button>
+  </div>
+</div>
+
+<!-- ══ RANKING ══ -->
+<div id="screen-ranking" class="screen">
+  <div style="text-align:center;margin-bottom:16px"><h1>🏆 Papan Peringkat</h1></div>
+  <div style="width:100%;max-width:540px">
+    <button class="back-btn" onclick="tampilMenu()">← Kembali</button>
+    <div id="ranking-list"></div>
+  </div>
+</div>
+
+<!-- ══ STATISTIK ══ -->
+<div id="screen-stats" class="screen">
+  <div style="text-align:center;margin-bottom:16px"><h1>📊 Statistikku</h1></div>
+  <div style="width:100%;max-width:540px">
+    <button class="back-btn" onclick="tampilMenu()">← Kembali</button>
+    <div id="stats-content"></div>
+  </div>
+</div>
+
+<!-- ══ PANDUAN ══ -->
+<div id="screen-panduan" class="screen">
+  <div style="text-align:center;margin-bottom:16px"><h1>📖 Panduan Bermain</h1></div>
+  <div style="width:100%;max-width:540px">
+    <button class="back-btn" onclick="tampilMenu()">← Kembali</button>
+    <div class="panduan-box">
+      <h3>🤖 Apa itu Robot Logika?</h3>
+      <p>Robot Logika adalah robot pintar yang butuh bantuanmu! Setiap hari ia menghadapi berbagai situasi dan perlu memilih keputusan yang tepat. Tugasmu adalah membantu Robot membuat pilihan yang benar dan baik.</p>
+    </div>
+    <div class="panduan-box">
+      <h3>🎮 Cara Bermain</h3>
+      <ul>
+        <li>Baca situasi yang dialami Robot dengan teliti</li>
+        <li>Pilih jawaban yang paling tepat dari 4 pilihan</li>
+        <li>Baca penjelasan setelah menjawab untuk belajar</li>
+        <li>Lulus jika menjawab benar sesuai batas minimum</li>
+        <li>Level baru terbuka setelah level sebelumnya lulus</li>
+      </ul>
+    </div>
+    <div class="panduan-box">
+      <h3>🗺️ Level Permainan</h3>
+      <table class="level-table">
+        <tr><th>Level</th><th>Tema</th><th>Soal</th><th>Min Lulus</th></tr>
+        <tr><td>1 🏠</td><td>Robot Rumah</td><td>5</td><td>3</td></tr>
+        <tr><td>2 🏫</td><td>Robot Sekolah</td><td>6</td><td>4</td></tr>
+        <tr><td>3 🌳</td><td>Robot Lingkungan</td><td>7</td><td>5</td></tr>
+        <tr><td>4 👥</td><td>Robot Sosial</td><td>8</td><td>6</td></tr>
+        <tr><td>5 🤖</td><td>Robot Bijaksana</td><td>10</td><td>7</td></tr>
+      </table>
+    </div>
+    <div class="panduan-box">
+      <h3>⭐ Sistem Poin</h3>
+      <ul>
+        <li>Jawaban benar = poin sesuai level (10–50 poin)</li>
+        <li>Jawaban salah = 0 poin</li>
+        <li>Total skor dihitung dari skor terbaik per level</li>
+        <li>Selesaikan semua level untuk mendapat 5 bintang! 🌟</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+let pemain = null;
+let sesi = null; // { sessionId, totalSoal, level, namaLevel, konfig, nomorSoal, skor, benar }
+let pendingSoal = null;
+let menunggu = false;
+
+// ── UTIL ───────────────────────────────────────────────────────────────────
+function layar(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function toast(msg, ms = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), ms);
+}
+
+async function api(url, body) {
+  const r = await fetch(url, body
+    ? { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) }
+    : { method:'GET' });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.error || 'Terjadi kesalahan');
+  return d;
+}
+
+// ── LOGIN ──────────────────────────────────────────────────────────────────
+async function handleLogin() {
+  const nama = document.getElementById('input-nama').value.trim();
+  if (nama.length < 2) { toast('❌ Nama minimal 2 huruf!'); return; }
+  try {
+    const d = await api('/api/login', { nama });
+    pemain = d.profil;
+    tampilMenu();
+  } catch(e) { toast('❌ ' + e.message); }
+}
+document.getElementById('input-nama').addEventListener('keydown', e => { if(e.key==='Enter') handleLogin(); });
+
+function tampilMenu() {
+  if (!pemain) { layar('login'); return; }
+  const inisial = pemain.nama.substring(0,2).toUpperCase();
+  document.getElementById('player-badge').innerHTML = `
+    <div class="avatar">${inisial}</div>
+    <div class="info">
+      <div class="badge-name">👋 Halo, ${pemain.nama}!</div>
+      <div class="badge-stats">⭐ ${pemain.totalSkor} poin &nbsp;·&nbsp; 🎯 Level ${pemain.levelTercapai} &nbsp;·&nbsp; 🏅 ${pemain.hadiah.length} hadiah</div>
+    </div>`;
+  layar('menu');
+}
+
+function gantiPemain() {
+  pemain = null;
+  document.getElementById('input-nama').value = '';
+  layar('login');
+}
+
+// ── LEVEL SELECT ───────────────────────────────────────────────────────────
+async function tampilLevel() {
+  try {
+    pemain = await api('/api/statistik/' + encodeURIComponent(pemain.nama));
+    const levels = await api('/api/levels');
+    const div = document.getElementById('level-list');
+    div.innerHTML = levels.map(l => {
+      const buka = l.level <= pemain.levelTercapai;
+      const done = pemain.levelSelesai.includes(l.level);
+      const cls = !buka ? 'locked' : done ? 'done' : '';
+      const ico = !buka ? '🔒' : done ? '✅' : '▶️';
+      return `<div class="level-card ${cls}" onclick="${buka ? `mulaiGame(${l.level})` : ''}">
+        <div class="level-emoji">${l.emoji}</div>
+        <div style="flex:1">
+          <div class="level-name">Level ${l.level}: ${l.nama}</div>
+          <div class="level-desc">${l.deskripsi}</div>
+          <div class="level-meta">❓ ${l.jumlahSoal} soal &nbsp;·&nbsp; Min lulus: ${l.minLulus} benar &nbsp;·&nbsp; ⭐ ${l.scorePerSoal}poin</div>
+        </div>
+        <div class="level-status">${ico}</div>
+      </div>`;
+    }).join('');
+    layar('level');
+  } catch(e) { toast('❌ ' + e.message); }
+}
+
+// ── GAME ───────────────────────────────────────────────────────────────────
+async function mulaiGame(level) {
+  try {
+    const d = await api('/api/mulai', { nama: pemain.nama, level });
+    sesi = {
+      sessionId: d.sessionId, totalSoal: d.totalSoal,
+      level: d.level, namaLevel: d.namaLevel, konfig: d.konfig,
+      nomorSoal: 1, skor: 0, benar: 0,
+    };
+    layar('game');
+    renderSoal(d.soal, 1);
+  } catch(e) { toast('❌ ' + e.message); }
+}
+
+function renderSoal(soal, nomor) {
+  menunggu = false;
+  pendingSoal = null;
+  document.getElementById('feedback').className = 'feedback';
+
+  // Header
+  document.getElementById('g-level').textContent = sesi.level;
+  document.getElementById('g-soal').textContent = `${nomor}/${sesi.totalSoal}`;
+  document.getElementById('prog-fill').style.width = ((nomor-1)/sesi.totalSoal*100) + '%';
+  document.getElementById('prog-label').textContent = `${nomor-1} / ${sesi.totalSoal} soal`;
+
+  // Robot
+  document.getElementById('robot-ekspresi').textContent = '🤖';
+  document.getElementById('robot-kata').textContent = 'Ayo bantu aku berpikir! 🤔';
+
+  // Soal
+  document.getElementById('q-num').textContent = `Soal ${nomor}`;
+  document.getElementById('q-situasi').textContent = soal.situasi;
+  document.getElementById('q-text').textContent = soal.pertanyaan;
+
+  // Pilihan
+  const labels = ['A','B','C','D'];
+  document.getElementById('choices').innerHTML = soal.pilihan.map((p,i) =>
+    `<button class="choice-btn" id="ch-${i}" onclick="pilih(${i})">
+      <span class="choice-letter">${labels[i]}</span>${p}
+    </button>`
+  ).join('');
+}
+
+async function pilih(idx) {
+  if (menunggu) return;
+  menunggu = true;
+  document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+  try {
+    const res = await api('/api/jawab', { sessionId: sesi.sessionId, indexJawaban: idx });
+    if (res.selesai) {
+      tampilHasil(res.hasilSesi, res.profil);
+      return;
+    }
+    // Highlight
+    document.getElementById('ch-' + idx).classList.add(res.benar ? 'correct' : 'wrong');
+
+    // Update skor
+    sesi.skor = res.totalSkor;
+    if (res.benar) sesi.benar++;
+    document.getElementById('g-skor').textContent = res.totalSkor;
+    document.getElementById('g-benar').textContent = sesi.benar;
+
+    // Robot reaksi
+    document.getElementById('robot-ekspresi').textContent = res.robotEkspresi || (res.benar ? '😄' : '😅');
+    document.getElementById('robot-kata').textContent = res.benar ? 'Hebat! Kamu benar! 🎉' : 'Ups, kurang tepat. Yuk belajar dari penjelasan! 📚';
+
+    // Feedback
+    const fb = document.getElementById('feedback');
+    document.getElementById('fb-head').innerHTML = res.benar
+      ? '✅ Benar! Kamu hebat!'
+      : '❌ Belum tepat. Tidak apa-apa!';
+    document.getElementById('fb-body').textContent = res.penjelasan;
+    fb.className = 'feedback show ' + (res.benar ? 'benar' : 'salah');
+
+    pendingSoal = res.soal;
+    sesi.nomorSoal++;
+    const lanjut = document.getElementById('btn-lanjut');
+    lanjut.textContent = sesi.nomorSoal <= sesi.totalSoal
+      ? `Soal ${sesi.nomorSoal}/${sesi.totalSoal} →`
+      : 'Lihat Hasil 🏁';
+  } catch(e) { toast('❌ ' + e.message); menunggu = false; }
+}
+
+function lanjutSoal() {
+  if (!pendingSoal) return;
+  renderSoal(pendingSoal, sesi.nomorSoal);
+}
+
+// ── HASIL ─────────────────────────────────────────────────────────────────
+function tampilHasil(hasil, profil) {
+  pemain = profil;
+  const lulus = hasil.lulus;
+  const hero = document.getElementById('result-hero');
+  hero.className = 'result-hero anim ' + (lulus ? 'result-lulus' : 'result-gagal');
+  hero.innerHTML = `
+    <div class="result-icon">${lulus ? '🎉' : '😢'}</div>
+    <div class="result-title">${lulus ? 'SELAMAT! Kamu Lulus!' : 'Belum Lulus'}</div>
+    <div class="result-sub">${lulus ? 'Robot sangat bangga padamu!' : `Perlu ${hasil.hasilSesi?.minLulus || ''} jawaban benar. Coba lagi ya!`}</div>
+  `;
+  document.getElementById('result-stats').innerHTML = `
+    <div class="rs-box"><div class="rs-val">${hasil.skor}</div><div class="rs-lbl">⭐ Skor</div></div>
+    <div class="rs-box"><div class="rs-val" style="color:var(--green)">${hasil.benar}/${hasil.totalSoal}</div><div class="rs-lbl">✅ Benar</div></div>
+    <div class="rs-box"><div class="rs-val" style="color:var(--yellow)">${Math.round(hasil.benar/hasil.totalSoal*100)}%</div><div class="rs-lbl">📈 Akurasi</div></div>
+  `;
+  // Hadiah
+  const hw = document.getElementById('hadiah-box-wrap');
+  if (lulus && hasil.hadiah) {
+    hw.innerHTML = `<div class="hadiah-box"><div class="h-icon">🏅</div><div class="h-name">${hasil.hadiah}</div></div>`;
+  } else { hw.innerHTML = ''; }
+
+  // Detail
+  document.getElementById('detail-list').innerHTML = (hasil.hasilPerSoal || []).map(h => `
+    <div class="detail-item ${h.jawabBenar ? 'b' : 's'}">
+      <span style="font-size:1.2rem">${h.robotEkspresi || (h.jawabBenar ? '✅' : '❌')}</span>
+      <div style="flex:1">
+        <div style="font-weight:800;font-size:.82rem">Soal ${h.nomor}: ${h.pertanyaan.substring(0,55)}...</div>
+        ${!h.jawabBenar ? `<div style="font-size:.77rem;color:var(--red)">Kamu: ${h.dipilih}</div>
+        <div style="font-size:.77rem;color:var(--green)">Benar: ${h.benar}</div>` : ''}
+      </div>
+      <div style="font-weight:900;color:var(--yellow);font-size:.9rem">+${h.skor}</div>
+    </div>`).join('');
+
+  document.getElementById('btn-ulangi').onclick = () => mulaiGame(hasil.level);
+  layar('hasil');
+}
+
+// ── RANKING ───────────────────────────────────────────────────────────────
+async function tampilRanking() {
+  try {
+    const r = await api('/api/ranking');
+    const med = ['🥇','🥈','🥉'];
+    document.getElementById('ranking-list').innerHTML = r.length === 0
+      ? '<p style="color:var(--muted);text-align:center;font-weight:700">Belum ada data pemain.</p>'
+      : r.map((p,i) => `
+        <div class="rank-item">
+          <div class="rank-num" style="color:${i===0?'#f59e0b':i===1?'#94a3b8':i===2?'#cd7c2f':'var(--muted)'}">${i<3?med[i]:i+1}</div>
+          <div><div class="rank-name">${p.nama}</div><div class="rank-meta">🎯 Level ${p.levelTercapai} · 🏅 ${p.hadiah} hadiah</div></div>
+          <div class="rank-score">⭐ ${p.totalSkor}</div>
+        </div>`).join('');
+    layar('ranking');
+  } catch(e) { toast('❌ ' + e.message); }
+}
+
+// ── STATISTIK ─────────────────────────────────────────────────────────────
+async function tampilStats() {
+  try {
+    const s = await api('/api/statistik/' + encodeURIComponent(pemain.nama));
+    const st = s.statistik;
+    document.getElementById('stats-content').innerHTML = `
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-val">${s.totalSkor}</div><div class="stat-lbl">⭐ Total Skor</div></div>
+        <div class="stat-box"><div class="stat-val">${s.levelTercapai}/5</div><div class="stat-lbl">🎯 Level Dicapai</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--green)">${st.benar}</div><div class="stat-lbl">✅ Jawab Benar</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--red)">${st.salah}</div><div class="stat-lbl">❌ Jawab Salah</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--yellow)">${st.akurasi}%</div><div class="stat-lbl">📈 Akurasi</div></div>
+        <div class="stat-box"><div class="stat-val">${s.riwayat.length}</div><div class="stat-lbl">🎮 Total Main</div></div>
+      </div>
+      <div style="font-weight:900;margin-bottom:10px">🏅 Hadiah Diperoleh (${s.hadiah.length}/5):</div>
+      <div class="hadiah-tags" style="margin-bottom:18px">
+        ${s.hadiah.length === 0
+          ? '<p style="color:var(--muted);font-weight:700;font-size:.88rem">Belum ada hadiah. Selesaikan level untuk mendapat hadiah!</p>'
+          : s.hadiah.map(h => `<div class="h-tag">🏅 ${h}</div>`).join('')}
+      </div>
+      <div style="font-weight:900;margin-bottom:10px">📜 5 Permainan Terakhir:</div>
+      ${s.riwayat.slice(-5).reverse().map(r => `
+        <div class="riwayat-item">
+          <div>
+            <div style="font-weight:900;font-size:.9rem">Level ${r.level} - ${r.namaLevel}</div>
+            <div style="font-size:.78rem;color:var(--muted);font-weight:700">${new Date(r.tanggal).toLocaleDateString('id-ID')} · ${r.benar}/${r.totalSoal} benar</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-weight:900;color:var(--yellow)">⭐ ${r.skor}</div>
+            <div style="font-size:.78rem;font-weight:800;${r.lulus?'color:var(--green)':'color:var(--red)'}">${r.lulus?'✅ Lulus':'❌ Ulang'}</div>
+          </div>
+        </div>`).join('')}
+    `;
+    layar('stats');
+  } catch(e) { toast('❌ ' + e.message); }
+}
+
+function tampilPanduan() { layar('panduan'); }
+</script>
+</body>
+</html>

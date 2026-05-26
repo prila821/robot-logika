@@ -1,0 +1,57 @@
+{
+  "pemain": {
+    "pier": {
+      "nama": "Pier",
+      "dibuat": "2026-05-26T11:45:15.969Z",
+      "totalSkor": 50,
+      "levelTercapai": 2,
+      "levelSelesai": [
+        1
+      ],
+      "hadiah": [
+        "Bintang Rumah Bersih"
+      ],
+      "riwayat": [
+        {
+          "id": 1779795989732,
+          "tanggal": "2026-05-26T11:46:29.732Z",
+          "level": 1,
+          "namaLevel": "Robot Rumah",
+          "skor": 50,
+          "benar": 5,
+          "totalSoal": 5,
+          "lulus": true
+        }
+      ],
+      "statistik": {
+        "totalSoal": 5,
+        "benar": 5,
+        "salah": 0,
+        "akurasi": 100
+      }
+    },
+    "siti": {
+      "nama": "Siti",
+      "dibuat": "2026-05-26T11:47:04.196Z",
+      "totalSkor": 0,
+      "levelTercapai": 1,
+      "levelSelesai": [],
+      "hadiah": [],
+      "riwayat": [],
+      "statistik": {
+        "totalSoal": 0,
+        "benar": 0,
+        "salah": 0,
+        "akurasi": 0
+      }
+    }
+  },
+  "ranking": [
+    {
+      "nama": "Pier",
+      "totalSkor": 50,
+      "levelTercapai": 2,
+      "hadiah": 1
+    }
+  ]
+}
